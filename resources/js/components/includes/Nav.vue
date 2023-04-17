@@ -24,7 +24,7 @@
                 v-if="$store.getters.user.role != 6"
             >
                 <div
-                    @click="setMenu('courses'), closeMenu()"
+                    @click="setMenu('tasks'), closeMenu()"
                     class="text-xl hover:text-[#510a8b] duration-500 cursor-pointer"
                 >
                     <router-link

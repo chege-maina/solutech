@@ -106,6 +106,14 @@ class AuthController extends Controller
             return response()->json($response, 400);
         }
     }
+    public function listUsers()
+    {
+
+        $user = User::with('roles')->orderBy('id')->get();
+        return response()->json([
+            'user' => $user
+        ]);
+    }
     public function forgotPassword(Request $request)
     {
         if ($request->isMethod('post')) {

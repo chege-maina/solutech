@@ -169,7 +169,7 @@ export default {
                     if (store.getters.user.role == 6) {
                         store.dispatch("dashMenus", "schedule");
                     } else {
-                        store.dispatch("dashMenus", "courses");
+                        store.dispatch("dashMenus", "tasks");
                     }
                     router.push({ name: "Dashboard" });
                 } else {

@@ -73,6 +73,11 @@
                                     :disabled="!buttonsActive"
                                     type="submit"
                                     class="w-full px-4 py-2 tracking-wide text-white transition-colors duration-300 transform bg-[#310058] rounded-lg hover:bg-[#300058b6] focus:outline-none focus:bg-[#300058b6] focus:ring focus:ring-blue-300 focus:ring-opacity-50"
+                                    :class="[
+                                        buttonsActive
+                                            ? ''
+                                            : 'bg-[#808080] text-white hover:bg-[#808080]',
+                                    ]"
                                 >
                                     Send Password Link
                                 </button>
@@ -82,7 +87,11 @@
                         <p class="mt-6 text-sm text-center">
                             <router-link
                                 class="text-sm text-blue-500 focus:text-blue-500 hover:text-blue-500 hover:underline"
-                                :to="{ name: 'Login' }"
+                                :to="
+                                    !buttonsActive
+                                        ? { name: 'ForgotPass' }
+                                        : { name: 'Login' }
+                                "
                                 ><i class="bi bi-arrow-left-circle-fill"></i>
                                 Back to Sign in?</router-link
                             >
@@ -104,6 +113,7 @@ export default {
         let error = ref("");
         let success = ref("");
         const router = useRouter();
+        const { res: resp, message: msg, postData: postData } = usePost();
         let form = reactive({
             email: "",
         });
@@ -111,12 +121,6 @@ export default {
         const changePassword = () => {
             buttonsActive.value = false;
 
-            const {
-                res: resp,
-                message: msg,
-                postData: postData,
-                resData: data,
-            } = usePost();
             postData("/api/forgotpsw", form).then(() => {
                 if (resp.value) {
                     error.value = "";

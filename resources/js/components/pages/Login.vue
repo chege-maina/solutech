@@ -157,6 +157,12 @@ export default {
         const router = useRouter();
         const store = useStore();
         let passView = ref(false);
+        const {
+            res: resp,
+            message: msg,
+            postData: postData,
+            resData: data,
+        } = usePost();
         let form = reactive({
             email: "",
             password: "",
@@ -164,12 +170,6 @@ export default {
         let error = ref("");
 
         const login = () => {
-            const {
-                res: resp,
-                message: msg,
-                postData: postData,
-                resData: data,
-            } = usePost();
             postData("/api/login", form).then(() => {
                 if (resp.value) {
                     store.dispatch("setUser", data);

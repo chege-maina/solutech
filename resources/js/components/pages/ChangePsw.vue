@@ -211,12 +211,7 @@ export default {
         let error = ref("");
         let string = "";
         const router = useRouter();
-        const {
-            res: respCheck,
-            message: msg,
-            postData: postData,
-            resData: resData,
-        } = usePost();
+        const { res: respCheck, message: msg, postData: postData } = usePost();
         const { resData: getRes, getData: getData } = useGet();
         let form = reactive({
             password: "",

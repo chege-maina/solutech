@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\RoleController;
+use App\Http\Controllers\API\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,5 +30,11 @@ Route::controller(AuthController::class)->group(function () {
     Route::middleware('auth:sanctum')->get('CurrentDate', 'CurrentDate');
 });
 Route::controller(RoleController::class)->group(function () {
-    Route::get('getRoles', 'listRoles');
+    Route::middleware('auth:sanctum')->get('getRoles', 'listRoles');
+});
+Route::controller(TaskController::class)->group(function () {
+    Route::middleware('auth:sanctum')->get('getTasks', 'listTasks');
+    Route::middleware('auth:sanctum')->post('addTask', 'addTask');
+    Route::middleware('auth:sanctum')->post('editTask', 'editTask');
+    Route::middleware('auth:sanctum')->post('deleteTask/{id}', 'deleteTask');
 });

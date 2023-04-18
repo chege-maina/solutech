@@ -13,6 +13,12 @@ class Task extends Model
         'name',
         'description',
         'due_date',
+        'start_time',
+        'end_time',
         'status_id'
     ];
+    public function status()
+    {
+        return $this->belongsTo(Status::class, 'status_id', 'id');
+    }
 }

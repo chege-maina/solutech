@@ -8,6 +8,7 @@
                 </p>
             </div>
             <div v-if="$store.getters.menu === 'users'"><Users /></div>
+            <div v-if="$store.getters.menu === 'tasks'"><Tasks /></div>
         </div>
     </div>
 </template>
@@ -15,6 +16,7 @@
 <script>
 import Nav from "../../components/includes/Nav.vue";
 import Users from "../../components/dashboard/Users.vue";
+import Tasks from "../../components/dashboard/Tasks.vue";
 
 import { onMounted, ref, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
@@ -23,6 +25,7 @@ export default {
     components: {
         Nav,
         Users,
+        Tasks,
     },
     setup() {
         const router = useRouter();

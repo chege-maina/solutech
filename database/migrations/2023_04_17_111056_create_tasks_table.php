@@ -18,7 +18,7 @@ return new class extends Migration
             $table->dateTime('due_date');
             $table->dateTime('start_time');
             $table->dateTime('end_time');
-            $table->foreignId('status_id')->constrained('status')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('status_id')->constrained('statuses')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });
     }

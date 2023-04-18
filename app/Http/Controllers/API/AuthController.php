@@ -230,7 +230,7 @@ class AuthController extends Controller
             $user->delete();
             $response = [
                 'success' => true,
-                'message' => 'User registered successfully'
+                'message' => 'User Deleted successfully'
             ];
 
             return response()->json($response, 200);
@@ -260,7 +260,7 @@ class AuthController extends Controller
             $user->save();
             $response = [
                 'success' => true,
-                'message' => 'User Deleted successfully'
+                'message' => 'User Edited successfully'
             ];
 
             return response()->json($response, 200);

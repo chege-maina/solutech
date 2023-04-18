@@ -264,8 +264,7 @@
                                         option.email,
                                         option.name,
                                         option.roles.id,
-                                        option.id,
-                                        option.phone
+                                        option.id
                                     )
                             "
                         ></i>
@@ -371,7 +370,7 @@
         </div>
 
         <form class="my-8 px-4" @submit.prevent="register" v-else>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <input
                     class="block w-full px-4 py-2 my-2 rounded-lg placeholder-gray-600 bg-gray-900 text-gray-300 border-gray-700 focus:border-[#310058] focus:ring-[#310058] focus:outline-none focus:ring focus:ring-opacity-40"
                     type="email"
@@ -390,8 +389,6 @@
                     placeholder="Name"
                     required
                 />
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <select
                     v-model="form.role_id"
                     class="block w-full px-4 py-2 my-2 rounded-lg placeholder-gray-600 bg-gray-900 text-gray-300 border-gray-700 focus:border-[#310058] focus:ring-[#310058] focus:outline-none focus:ring focus:ring-opacity-40"
@@ -432,10 +429,15 @@
 <script>
 import Modal from "../../components/includes/Modal.vue";
 import { ref, onMounted, reactive } from "vue";
+import { usePost } from "../composables/post";
+import { useGet } from "../composables/get";
 
 export default {
     components: { Modal },
     setup() {
+        const { resData: getRes, getData: getData } = useGet();
+        const { res: resp, message: msg, postData: postData } = usePost();
+
         const modalActive = ref(false);
         const buttonsActive = ref(true);
         const heading = ref();
@@ -444,7 +446,6 @@ export default {
             name: "",
             email: "",
             role_id: "",
-            phone: "",
         };
         const form = reactive({ ...initialState });
         let error = ref("");
@@ -469,26 +470,26 @@ export default {
         let secondPosition = ref(0);
         let phoneSuffix = ref("");
         onMounted(() => {
-            axios
-                .get("/api/getUsers")
-                .then((res) => {
-                    if (res.data.user) {
-                        options.value = res.data.user;
+            getData("/api/getUsers")
+                .then(() => {
+                    if (getRes.value) {
+                        options.value = getRes.value;
                         paginateOptions();
+                        getData("/api/getRoles")
+                            .then(() => {
+                                if (getRes.value) {
+                                    roleOptions.value = getRes.value;
+                                }
+                            })
+                            .catch((e) => {
+                                error.value = e;
+                                console.log(e);
+                            });
                     }
                 })
                 .catch((e) => {
-                    error.value = e.res.data.message;
-                });
-            axios
-                .get("/api/getRoles")
-                .then((res) => {
-                    if (res.data.roles) {
-                        roleOptions.value = res.data.roles;
-                    }
-                })
-                .catch((e) => {
-                    error.value = e.res.data.message;
+                    error.value = e;
+                    console.log(e);
                 });
         });
 
@@ -605,18 +606,16 @@ export default {
             userstatus.value = d_status;
             modalData.value = d_name;
         };
-        const deleteUsr = async () => {
-            await axios
-
-                .post("/api/delete/" + userid.value)
-                .then((res) => {
-                    if (res.data.success) {
+        const deleteUsr = () => {
+            postData("/api/delete/" + userid.value)
+                .then(() => {
+                    if (resp.value) {
                         location.reload();
                         toggleModal();
                     }
                 })
                 .catch((e) => {
-                    error.value = e.response.data.message;
+                    error.value = e;
                 });
         };
         const statusUsr = async () => {
@@ -629,7 +628,17 @@ export default {
                     userStat.status = 2;
                 }
                 userStat.id = userid.value;
-                await axios
+                postData("/api/statusUsr", userStat)
+                    .then(() => {
+                        if (resp.value) {
+                            location.reload();
+                            toggleModal();
+                        }
+                    })
+                    .catch((e) => {
+                        error.value = e;
+                    });
+                /*await axios
                     .post("/api/statusUsr", userStat)
                     .then((res) => {
                         if (res.data.success) {
@@ -639,10 +648,10 @@ export default {
                     })
                     .catch((e) => {
                         error.value = e.response.data.message;
-                    });
+                    });*/
             }
         };
-        const register = async () => {
+        const register = () => {
             buttonsActive.value = false;
             let url = "";
             if (heading.value === "Add New User") {
@@ -650,18 +659,18 @@ export default {
             } else {
                 url = "edit";
             }
-
-            await axios
-                .post("/api/" + url, form)
-                .then((res) => {
-                    if (res.data.success) {
+            postData("/api/" + url, form)
+                .then(() => {
+                    if (resp.value) {
                         location.reload();
                         toggleModal();
+                    } else {
+                        error.value = msg.value;
                     }
                 })
                 .catch((e) => {
                     buttonsActive.value = true;
-                    error.value = e.response.data.message;
+                    error.value = e;
                 });
         };
 

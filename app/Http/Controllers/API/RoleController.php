@@ -12,7 +12,7 @@ class RoleController extends Controller
     {
         $role = Role::orderBy('id')->get();
         return response()->json([
-            'roles' => $role
+            'data' => $role
         ]);
     }
 }

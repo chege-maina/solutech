@@ -172,7 +172,7 @@ export default {
         const login = () => {
             postData("/api/login", form).then(() => {
                 if (resp.value) {
-                    store.dispatch("setUser", data);
+                    store.dispatch("setUser", data.value);
                     if (store.getters.user.role == 6) {
                         store.dispatch("dashMenus", "schedule");
                     } else {

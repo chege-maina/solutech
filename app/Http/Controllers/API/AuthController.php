@@ -51,8 +51,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email',
-            'role_id' => 'required',
-            'phone' => 'required'
+            'role_id' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -61,7 +60,7 @@ class AuthController extends Controller
                 //'message' => $validator->errors()
                 'message' => "Fill in all the Fields Below Properly"
             ];
-            return response()->json($response, 400);
+            return response()->json($response);
         }
 
         $password = $this->generateRandomString();
@@ -70,9 +69,9 @@ class AuthController extends Controller
         $mailData = [
             'email' => $request->email,
             'name' => $request->name,
-            'title' => " Welcome to LEAP INITIATIVE system",
+            'title' => " Welcome to SOLUTECH system",
             'subject' => "Account Activation",
-            'message' => "This message is to let you know that your account at LEAP INITIATIVE
+            'message' => "This message is to let you know that your account at SOLUTECH
             is ready to be used.",
             'bold' => "You are required to use the link below to create your password and
             activate your account.",
@@ -89,9 +88,16 @@ class AuthController extends Controller
         try {
 
 
-            Mail::to($request->email)->send(new RegistrationEmail($mailData));
             User::create($input);
-
+            try {
+                Mail::to($request->email)->send(new RegistrationEmail($mailData));
+            } catch (\Throwable $th) {
+                $response = [
+                    'success' => false,
+                    'message' => "Email not Sent"
+                ];
+                return response()->json($response);
+            }
             $response = [
                 'success' => true,
                 'message' => 'User registered successfully'
@@ -101,9 +107,9 @@ class AuthController extends Controller
         } catch (\Throwable $th) {
             $response = [
                 'success' => false,
-                'message' => "User Email/Name Already Exists or Check Internet Connection"
+                'message' => "User Email Already Exists"
             ];
-            return response()->json($response, 400);
+            return response()->json($response);
         }
     }
     public function listUsers()
@@ -111,7 +117,7 @@ class AuthController extends Controller
 
         $user = User::with('roles')->orderBy('id')->get();
         return response()->json([
-            'user' => $user
+            'data' => $user
         ]);
     }
     public function forgotPassword(Request $request)
@@ -214,6 +220,64 @@ class AuthController extends Controller
 
             return response()->json($response, 200);
         }
+    }
+    public function deleteUser(Request $request, $id)
+    {
+        if ($request->isMethod('post')) {
+
+            $user = User::findOrfail($id);
+
+            $user->delete();
+            $response = [
+                'success' => true,
+                'message' => 'User registered successfully'
+            ];
+
+            return response()->json($response, 200);
+        }
+    }
+    public function editUser(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            // validation
+            $validator = Validator::make($request->all(), [
+                'name' => 'required',
+                'email' => 'required|email',
+                'role_id' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                $response = [
+                    'success' => false,
+                    'message' => "Fill in all the Fields Below Properly"
+                ];
+                return response()->json($response);
+            }
+            $user = User::where('id', $request->id)->first();
+            $user->email = $request->get('email');
+            $user->name = $request->get('name');
+            $user->role_id = $request->get('role_id');
+            $user->save();
+            $response = [
+                'success' => true,
+                'message' => 'User Deleted successfully'
+            ];
+
+            return response()->json($response, 200);
+        }
+    }
+    public function changeStatus(Request $request)
+    {
+
+        $user = User::where('id', $request->id)->first();
+        $user->status = $request->get('status');
+        $user->save();
+        $response = [
+            'success' => true,
+            'message' => 'Status Changed successfully'
+        ];
+
+        return response()->json($response, 200);
     }
     function generateRandomString($length = 10)
     {

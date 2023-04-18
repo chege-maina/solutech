@@ -411,6 +411,11 @@
                     class="rounded-full text-[#510a8b] py-2 px-4 hover:border hover:border-[#510a8b] duration-300 mt-3 sm:mt-0 sm:w-auto w-full"
                     @click="clearForm"
                     :disabled="!buttonsActive"
+                    :class="[
+                        buttonsActive
+                            ? ''
+                            : 'bg-[#808080] text-white hover:bg-[#808080]',
+                    ]"
                 >
                     Clear
                 </button>
@@ -418,6 +423,11 @@
                     class="bg-[#510a8b] rounded-full text-white py-2 px-4 hover:scale-105 duration-300 mt-3 sm:mt-0 sm:w-auto w-full"
                     type="submit"
                     :disabled="!buttonsActive"
+                    :class="[
+                        buttonsActive
+                            ? ''
+                            : 'bg-[#808080] text-white hover:bg-[#808080]',
+                    ]"
                 >
                     Save
                 </button>
@@ -494,9 +504,11 @@ export default {
         });
 
         const toggleModal = () => {
-            modalActive.value = !modalActive.value;
-            buttonsActive.value = true;
-            clearForm();
+            if (buttonsActive.value) {
+                modalActive.value = !modalActive.value;
+                buttonsActive.value = true;
+                clearForm();
+            }
         };
         const clearForm = () => {
             Object.assign(form, initialState);
@@ -618,7 +630,7 @@ export default {
                     error.value = e;
                 });
         };
-        const statusUsr = async () => {
+        const statusUsr = () => {
             if (userstatus.value === 0) {
                 error.value = "You Cannot Change New User Status";
             } else {
@@ -638,17 +650,6 @@ export default {
                     .catch((e) => {
                         error.value = e;
                     });
-                /*await axios
-                    .post("/api/statusUsr", userStat)
-                    .then((res) => {
-                        if (res.data.success) {
-                            location.reload();
-                            toggleModal();
-                        }
-                    })
-                    .catch((e) => {
-                        error.value = e.response.data.message;
-                    });*/
             }
         };
         const register = () => {
@@ -665,6 +666,7 @@ export default {
                         location.reload();
                         toggleModal();
                     } else {
+                        buttonsActive.value = true;
                         error.value = msg.value;
                     }
                 })

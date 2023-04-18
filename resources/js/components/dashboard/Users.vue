@@ -478,7 +478,6 @@ export default {
         let FilteredPages = ref([]);
         let firstPosition = ref(0);
         let secondPosition = ref(0);
-        let phoneSuffix = ref("");
         onMounted(() => {
             getData("/api/getUsers")
                 .then(() => {
@@ -517,12 +516,11 @@ export default {
         const setHeading = (headSet) => {
             heading.value = headSet;
         };
-        const setEdit = (e_email, e_name, e_role, e_id, e_phone) => {
+        const setEdit = (e_email, e_name, e_role, e_id) => {
             form.email = e_email;
             form.name = e_name;
             form.role_id = e_role;
             form.id = e_id;
-            form.phone = e_phone;
         };
         const setDelete = (d_id, d_name) => {
             userid.value = d_id;
@@ -710,7 +708,6 @@ export default {
             clearForm,
             heading,
             form,
-            phoneSuffix,
         };
     },
 };

@@ -101,7 +101,6 @@ export default {
     setup() {
         let email = "";
         const buttonsActive = ref(true);
-        let data = ref([]);
         let error = ref("");
         let success = ref("");
         const router = useRouter();
@@ -109,7 +108,7 @@ export default {
             email: "",
         });
 
-        const changePassword = async () => {
+        const changePassword = () => {
             buttonsActive.value = false;
 
             const {

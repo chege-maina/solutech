@@ -173,15 +173,13 @@ class AuthController extends Controller
             }
         }
     }
-    public function getEmail(Request $request, $email)
+    public function getEmail($email)
     {
-        if ($request->isMethod('post')) {
 
-            $user = User::where('email', '=', $email)->orderBy('id')->get();
-            return response()->json([
-                'user' => $user
-            ]);
-        }
+        $user = User::where('email', '=', $email)->orderBy('id')->get();
+        return response()->json([
+            'data' => $user
+        ]);
     }
     public function changePassword(Request $request, $id)
     {
@@ -201,7 +199,7 @@ class AuthController extends Controller
                     'success' => false,
                     'message' => "Two password must match and be 8 or more characters"
                 ];
-                return response()->json($response, 400);
+                return response()->json($response);
             }
 
             //$user = User::where('email', '=', $email)->orderBy('id')->get();
@@ -211,7 +209,7 @@ class AuthController extends Controller
             $user->save();
             $response = [
                 'success' => true,
-                'message' => 'User registered successfully'
+                'message' => 'Password Changed successfully'
             ];
 
             return response()->json($response, 200);
@@ -231,7 +229,7 @@ class AuthController extends Controller
     {
         $date = date('Y/m/d H:i:s');
         return response()->json([
-            'date' => $date
+            'data' => $date
         ]);
     }
 }

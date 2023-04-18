@@ -24,7 +24,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::middleware('auth:sanctum')->post('statusUsr', 'changeStatus');
     Route::middleware('auth:sanctum')->post('delete/{id}', 'deleteUser');
     Route::middleware('auth:sanctum')->post('edit', 'editUser');
-    Route::middleware('auth:sanctum')->post('getuser/{id}', 'getEmail');
+    Route::middleware('auth:sanctum')->get('getuser/{id}', 'getEmail');
     Route::middleware('auth:sanctum')->post('changepsw/{id}', 'changePassword');
     Route::middleware('auth:sanctum')->get('CurrentDate', 'CurrentDate');
 });

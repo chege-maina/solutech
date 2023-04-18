@@ -198,6 +198,8 @@
 <script>
 import { onMounted, ref, reactive } from "vue";
 import { useRouter } from "vue-router";
+import { usePost } from "../composables/post";
+import { useGet } from "../composables/get";
 export default {
     props: ["id"],
 
@@ -209,6 +211,13 @@ export default {
         let error = ref("");
         let string = "";
         const router = useRouter();
+        const {
+            res: respCheck,
+            message: msg,
+            postData: postData,
+            resData: resData,
+        } = usePost();
+        const { resData: getRes, getData: getData } = useGet();
         let form = reactive({
             password: "",
             c_password: "",
@@ -219,17 +228,14 @@ export default {
                 string = atob(props.id);
                 string = string.split(" ");
                 email = string.at(0);
-                axios
-                    .post("/api/getuser/" + email)
-                    .then((resp) => {
-                        data.value = resp.data.user;
+                getData("/api/getuser/" + email).then(() => {
+                    if (getRes.value) {
+                        data.value = getRes.value;
                         if (data.value.length == 0) {
                             logout();
                         }
-                    })
-                    .catch((e) => {
-                        console.log(e);
-                    });
+                    }
+                });
             } catch (err) {
                 logout();
             }
@@ -237,39 +243,46 @@ export default {
         const togglePass = () => {
             passView.value = !passView.value;
         };
-        const getDateCur = async () => {
-            axios
-                .get("/api/CurrentDate/")
-                .then((resp) => {
-                    date.value = resp.data.date;
-                    var sentDate = new Date(string.at(2) + " " + string.at(3));
-                    var present_date = new Date(date.value);
+        const getDateCur = () => {
+            getData("/api/CurrentDate/")
+                .then(() => {
+                    if (getRes.value) {
+                        date.value = getRes.value;
+                        var sentDate = new Date(
+                            string.at(2) + " " + string.at(3)
+                        );
+                        var present_date = new Date(date.value);
 
-                    var Difference_In_Time =
-                        (present_date.getTime() - sentDate.getTime()) /
-                        (1000 * 3600);
-                    if (data.value.at(0).status === 1) {
-                        error.value =
-                            "You Have Been Disabled. Contact Tech Support";
-                    } else if (
-                        string.at(1) == "new" &&
-                        data.value.at(0).status === 2
-                    ) {
-                        error.value =
-                            "You Have Already Used This Link to Create Password";
-                    } else if (Difference_In_Time > 1) {
-                        error.value = "Change Password Link has Expired";
-                    } else {
-                        axios
-                            .post("/api/changepsw/" + data.value.at(0).id, form)
-                            .then((res) => {
-                                if (res.data.success) {
-                                    router.push({ name: "Login" });
-                                }
-                            })
-                            .catch((e) => {
-                                error.value = e.response.data.message;
-                            });
+                        var Difference_In_Time =
+                            (present_date.getTime() - sentDate.getTime()) /
+                            (1000 * 3600);
+                        if (data.value.at(0).status === 1) {
+                            error.value =
+                                "You Have Been Disabled. Contact Tech Support";
+                        } else if (
+                            string.at(1) == "new" &&
+                            data.value.at(0).status === 2
+                        ) {
+                            error.value =
+                                "You Have Already Used This Link to Create Password";
+                        } else if (Difference_In_Time > 1) {
+                            error.value = "Change Password Link has Expired";
+                        } else {
+                            postData(
+                                "/api/changepsw/" + data.value.at(0).id,
+                                form
+                            )
+                                .then(() => {
+                                    if (respCheck.value) {
+                                        router.push({ name: "Login" });
+                                    } else {
+                                        error.value = msg.value;
+                                    }
+                                })
+                                .catch((e) => {
+                                    error.value = msg.value;
+                                });
+                        }
                     }
                 })
                 .catch((e) => {

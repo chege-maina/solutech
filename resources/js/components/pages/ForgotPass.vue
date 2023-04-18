@@ -96,6 +96,7 @@
 <script>
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
+import { usePost } from "../composables/post";
 export default {
     setup() {
         let email = "";
@@ -110,13 +111,20 @@ export default {
 
         const changePassword = async () => {
             buttonsActive.value = false;
-            await axios.post("/api/forgotpsw", form).then((resp) => {
-                if (resp.data.success) {
+
+            const {
+                res: resp,
+                message: msg,
+                postData: postData,
+                resData: data,
+            } = usePost();
+            postData("/api/forgotpsw", form).then(() => {
+                if (resp.value) {
                     error.value = "";
-                    success.value = resp.data.message;
+                    success.value = msg.value;
                     close();
                 } else {
-                    error.value = resp.data.message;
+                    error.value = msg.value;
                     buttonsActive.value = true;
                 }
             });

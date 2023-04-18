@@ -151,6 +151,7 @@
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { usePost } from "../composables/post";
 export default {
     setup() {
         const router = useRouter();
@@ -162,10 +163,16 @@ export default {
         });
         let error = ref("");
 
-        const login = async () => {
-            await axios.post("/api/login", form).then((resp) => {
-                if (resp.data.success) {
-                    store.dispatch("setUser", resp.data.data);
+        const login = () => {
+            const {
+                res: resp,
+                message: msg,
+                postData: postData,
+                resData: data,
+            } = usePost();
+            postData("/api/login", form).then(() => {
+                if (resp.value) {
+                    store.dispatch("setUser", data);
                     if (store.getters.user.role == 6) {
                         store.dispatch("dashMenus", "schedule");
                     } else {
@@ -173,7 +180,7 @@ export default {
                     }
                     router.push({ name: "Dashboard" });
                 } else {
-                    error.value = resp.data.message;
+                    error.value = msg.value;
                 }
             });
         };

@@ -29,7 +29,7 @@ class RegistrationEmail extends Mailable
     {
         $sub = $this->mailData['subject'];
         return new Envelope(
-            subject: $sub . ' - LEAP INITIATIVE',
+            subject: $sub . ' - Solutech',
         );
     }
 

@@ -15,11 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('task_id')->constrained('tasks')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->timestamp('due_date');
-            $table->dateTime('start_time');
-            $table->dateTime('end_time');
             $table->string('remarks', 100);
-            $table->foreignId('status_id')->constrained('status')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });
     }

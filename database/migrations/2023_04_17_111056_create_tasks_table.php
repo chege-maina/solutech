@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name', 100);
             $table->string('description', 255);
-            $table->timestamp('due_date');
+            $table->dateTime('due_date');
+            $table->dateTime('start_time');
+            $table->dateTime('end_time');
             $table->foreignId('status_id')->constrained('status')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });

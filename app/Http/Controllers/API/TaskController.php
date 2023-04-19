@@ -4,11 +4,13 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Mail\RegistrationEmail;
+use App\Models\Status;
 use App\Models\Task;
 use App\Models\User_task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TaskController extends Controller
 {
@@ -203,5 +205,31 @@ class TaskController extends Controller
 
             return response()->json($response, 200);
         }
+    }
+    public function getReport()
+    {
+
+        $task = User_task::with('user')->with('task.status')->orderBy('id')->get();
+        return response()->json([
+            'data' => $task
+        ]);
+    }
+    public function getStatus()
+    {
+
+        $status = Status::orderBy('id')->get();
+        return response()->json([
+            'data' => $status
+        ]);
+    }
+    public function viewReport(Request $request)
+    {
+
+        $data = json_decode($request->data, TRUE);
+        $date = date('Y-m-d');
+
+        $pdf = PDF::loadView('report', compact('data'));
+        $pdf->setPaper('a4', 'landscape');
+        return $pdf->output();
     }
 }

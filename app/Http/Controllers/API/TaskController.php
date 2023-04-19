@@ -240,4 +240,16 @@ class TaskController extends Controller
             'data' => $count
         ]);
     }
+    public function setOverdue()
+    {
+        $date = date('Y/m/d H:i:s');
+        $tasks = Task::where('due_date', '<', $date)->where('status_id', '<', 3)->get();
+        print_r(json_decode($tasks, true));
+        foreach ($tasks as $task) {
+            $id = $task['id'];
+            $update = Task::where('id', '=', $id)->first();
+            $update->status_id = 4;
+            $update->save();
+        }
+    }
 }

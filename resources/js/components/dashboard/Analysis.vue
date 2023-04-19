@@ -33,6 +33,7 @@ export default {
         let tasksData = ref([]);
 
         onMounted(() => {
+            setOverdue();
             getDateCur();
             getTasksCount();
         });
@@ -71,6 +72,16 @@ export default {
                             ],
                         },
                     });
+                })
+                .catch((e) => {
+                    console.log(e);
+                });
+        };
+        const setOverdue = () => {
+            getData("/api/setOverdue/")
+                .then(() => {
+                    if (getRes.value) {
+                    }
                 })
                 .catch((e) => {
                     console.log(e);

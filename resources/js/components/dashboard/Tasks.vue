@@ -138,7 +138,7 @@
                             >
                             <span
                                 v-else-if="option.status_id === 2"
-                                class="uppercase tracking-wider text-blue-800 bg-green-200 rounded-lg bg-opacity-50 p-1.5 font-medium"
+                                class="uppercase tracking-wider text-blue-800 bg-blue-200 rounded-lg bg-opacity-50 p-1.5 font-medium"
                             >
                                 {{ option.status.name }}</span
                             >

@@ -166,4 +166,27 @@ class TaskController extends Controller
             return response()->json($response);
         }
     }
+    public function userTasks($id)
+    {
+
+        $task = User_task::with('task.status')->where('user_id', '=', $id)->orderBy('id')->get();
+        return response()->json([
+            'data' => $task
+        ]);
+    }
+    public function completeTask(Request $request, $id)
+    {
+        if ($request->isMethod('post')) {
+
+            $task = Task::where('id', $id)->first();
+            $task->status_id = 3;
+            $task->save();
+            $response = [
+                'success' => true,
+                'message' => 'Task Completed successfully'
+            ];
+
+            return response()->json($response, 200);
+        }
+    }
 }

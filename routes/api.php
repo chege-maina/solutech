@@ -43,5 +43,6 @@ Route::controller(TaskController::class)->group(function () {
     Route::middleware('auth:sanctum')->get('userTasks/{id}', 'userTasks');
     Route::middleware('auth:sanctum')->get('getReport', 'getReport');
     Route::middleware('auth:sanctum')->get('getStatus', 'getStatus');
+    Route::middleware('auth:sanctum')->get('getTasksCount', 'getTasksCount');
     Route::middleware('auth:sanctum')->post('viewReport', 'viewReport');
 });

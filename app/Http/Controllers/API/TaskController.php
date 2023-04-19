@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
 
 class TaskController extends Controller
 {
@@ -231,5 +232,12 @@ class TaskController extends Controller
         $pdf = PDF::loadView('report', compact('data'));
         $pdf->setPaper('a4', 'landscape');
         return $pdf->output();
+    }
+    public function getTasksCount()
+    {
+        $count = Task::with('status')->select('status_id', DB::raw('(count(status_id)) as totalTasks'))->groupBy('status_id')->get();
+        return response()->json([
+            'data' => $count
+        ]);
     }
 }

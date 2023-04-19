@@ -397,7 +397,6 @@
                 >
                 </textarea>
             </div>
-            {{ taskAssign }}
             <div
                 class="sm:flex items-right justify-end m-2 border-t p-2 sm:space-x-2"
             >

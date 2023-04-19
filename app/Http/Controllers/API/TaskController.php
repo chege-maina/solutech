@@ -189,4 +189,19 @@ class TaskController extends Controller
             return response()->json($response, 200);
         }
     }
+    public function editRemarks(Request $request)
+    {
+        if ($request->isMethod('post')) {
+
+            $task = User_task::where('id', $request->id)->first();
+            $task->remarks = $request->remarks;
+            $task->save();
+            $response = [
+                'success' => true,
+                'message' => 'Remarks Edited successfully'
+            ];
+
+            return response()->json($response, 200);
+        }
+    }
 }

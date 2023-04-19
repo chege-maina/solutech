@@ -142,6 +142,35 @@
                 </button>
             </div>
         </div>
+        <form class="my-8 px-4" @submit.prevent="remarks" v-else>
+            <div class="grid grid-cols-1 md:grid-cols-1 gap-2">
+                <textarea
+                    class="block w-full h-full px-4 rounded-lg placeholder-gray-600 bg-gray-900 text-gray-300 border-gray-700 focus:border-[#310058] focus:ring-[#310058] focus:outline-none focus:ring focus:ring-opacity-40"
+                    maxlength="100"
+                    v-model="form.remarks"
+                    placeholder="Remarks (Max-100 characters)"
+                    required
+                >
+                </textarea>
+            </div>
+            {{ form }}
+            <div
+                class="sm:flex items-right justify-end m-2 border-t p-2 sm:space-x-2"
+            >
+                <button
+                    class="rounded-full text-[#510a8b] py-2 px-4 hover:border hover:border-[#510a8b] duration-300 mt-3 sm:mt-0 sm:w-auto w-full"
+                    @click="clearForm"
+                >
+                    Clear
+                </button>
+                <button
+                    class="bg-[#510a8b] rounded-full text-white py-2 px-4 hover:scale-105 duration-300 mt-3 sm:mt-0 sm:w-auto w-full"
+                    type="submit"
+                >
+                    Save
+                </button>
+            </div>
+        </form>
     </Modal>
 </template>
 
@@ -247,9 +276,26 @@ export default {
             setHeading("Complete Task");
             toggleModal();
         };
-        const setRemarks = (option) => {};
+        const setRemarks = (option) => {
+            setHeading("Change Remarks");
+            toggleModal();
+            form.id = option.id;
+            form.remarks = option.remarks;
+        };
         const completeTask = () => {
             postData("/api/completeTask/" + taskId.value)
+                .then(() => {
+                    if (resp.value) {
+                        location.reload();
+                        toggleModal();
+                    }
+                })
+                .catch((e) => {
+                    error.value = e;
+                });
+        };
+        const remarks = () => {
+            postData("/api/editRemarks/", form)
                 .then(() => {
                     if (resp.value) {
                         location.reload();
@@ -268,10 +314,13 @@ export default {
             heading,
             error,
             filteredTasks,
+            form,
             nextPage,
             prevPage,
             searchList,
             toggleModal,
+            remarks,
+            clearForm,
             completeTask,
             setComplete,
             setRemarks,

@@ -37,4 +37,5 @@ Route::controller(TaskController::class)->group(function () {
     Route::middleware('auth:sanctum')->post('addTask', 'addTask');
     Route::middleware('auth:sanctum')->post('editTask', 'editTask');
     Route::middleware('auth:sanctum')->post('deleteTask/{id}', 'deleteTask');
+    Route::middleware('auth:sanctum')->post('assignTask', 'assignTask');
 });

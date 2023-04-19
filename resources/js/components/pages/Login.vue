@@ -173,11 +173,7 @@ export default {
             postData("/api/login", form).then(() => {
                 if (resp.value) {
                     store.dispatch("setUser", data.value);
-                    if (store.getters.user.role == 6) {
-                        store.dispatch("dashMenus", "schedule");
-                    } else {
-                        store.dispatch("dashMenus", "tasks");
-                    }
+                    store.dispatch("dashMenus", "analysis");
                     router.push({ name: "Dashboard" });
                 } else {
                     error.value = msg.value;

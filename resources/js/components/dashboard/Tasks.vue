@@ -163,11 +163,7 @@
                             @click="
                                 toggleModal(),
                                     setHeading('Assign Task To User');
-                                setStatus(
-                                    option.id,
-                                    option.status,
-                                    option.name
-                                );
+                                setStatus(option);
                             "
                         >
                             <i
@@ -212,7 +208,9 @@
                                           ]
                                 "
                                 :class="[
-                                    option.status > 0 ? 'text-[#504e4e]' : '',
+                                    option.status_id > 1
+                                        ? 'text-[#504e4e]'
+                                        : '',
                                 ]"
                             ></i>
                         </td>
@@ -306,9 +304,9 @@
                         class="text-red-500 text-xl px-1 cursor-pointer"
                         @click="
                             toggleModal(), setHeading('Assign Task To User');
-                            setStatus(option.id, option.status, option.name);
+                            setStatus(option);
                         "
-                        v-if="option.status < 2"
+                        v-if="option.status_id < 2"
                     >
                         <i class="bi bi-dash-circle-fill"></i>
                     </div>
@@ -321,9 +319,11 @@
                     <div class="text-[#9A031E] text-xl px-1 cursor-pointer">
                         <i
                             class="bi bi-trash-fill"
-                            :class="option.status > 0 ? 'text-[#504e4e]' : ''"
+                            :class="
+                                option.status_id > 1 ? 'text-[#504e4e]' : ''
+                            "
                             @click="
-                                option.status > 1
+                                option.status_id > 1
                                     ? null
                                     : [
                                           toggleModal(),
@@ -367,36 +367,66 @@
                 </button>
             </div>
         </div>
-        <div class="my-8 px-4" v-else-if="heading === 'Assign Task To User'">
-            <div class="grid grid-cols-1 gap-4">
-                <p>
-                    Are You Sure You Want To
-                    <span
-                        v-if="userstatus < 2"
-                        class="text-green-500 font-semibold"
+        <form
+            class="my-8 px-4"
+            @submit.prevent="assign"
+            v-else-if="heading === 'Assign Task To User'"
+        >
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <select
+                    v-model="taskAssign.user_id"
+                    class="block w-auto px-4 py-2 my-2 rounded-lg placeholder-gray-600 bg-gray-900 text-gray-300 border-gray-700 focus:border-[#310058] focus:ring-[#310058] focus:outline-none focus:ring focus:ring-opacity-40"
+                    required
+                    @change="setUser()"
+                >
+                    <option disabled value="">Please select User</option>
+                    <option
+                        v-for="option in userOptions"
+                        :key="option.id"
+                        :value="option.id"
                     >
-                        Activate {{ modalData }}</span
-                    ><span v-else class="text-[#9A031E] font-semibold">
-                        Deactivate {{ modalData }}</span
-                    >?
-                </p>
+                        {{ option.name }} - {{ option.email }}
+                    </option>
+                </select>
+                <textarea
+                    class="block w-full h-full px-4 rounded-lg placeholder-gray-600 bg-gray-900 text-gray-300 border-gray-700 focus:border-[#310058] focus:ring-[#310058] focus:outline-none focus:ring focus:ring-opacity-40"
+                    maxlength="100"
+                    v-model="taskAssign.remarks"
+                    placeholder="Remarks (Max-100 characters)"
+                    required
+                >
+                </textarea>
             </div>
+            {{ taskAssign }}
             <div
                 class="sm:flex items-right justify-end m-2 border-t p-2 sm:space-x-2"
             >
                 <button
-                    class="rounded-full text-white py-2 px-4 hover:scale-105 duration-300 mt-3 sm:mt-0 sm:w-auto w-full"
-                    @click="statusUsr"
-                    type="submit"
-                    :class="{
-                        'bg-[#9A031E]': userstatus > 1,
-                        'bg-green-500': userstatus < 2,
-                    }"
+                    class="rounded-full text-[#510a8b] py-2 px-4 hover:border hover:border-[#510a8b] duration-300 mt-3 sm:mt-0 sm:w-auto w-full"
+                    @click="clearForm"
+                    :disabled="!buttonsActive"
+                    :class="[
+                        buttonsActive
+                            ? ''
+                            : 'bg-[#808080] text-white hover:bg-[#808080]',
+                    ]"
                 >
-                    Okay
+                    Clear
+                </button>
+                <button
+                    class="bg-[#510a8b] rounded-full text-white py-2 px-4 hover:scale-105 duration-300 mt-3 sm:mt-0 sm:w-auto w-full"
+                    type="submit"
+                    :disabled="!buttonsActive"
+                    :class="[
+                        buttonsActive
+                            ? ''
+                            : 'bg-[#808080] text-white hover:bg-[#808080]',
+                    ]"
+                >
+                    Save
                 </button>
             </div>
-        </div>
+        </form>
 
         <form class="my-8 px-4" @submit.prevent="addTask" v-else>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -530,14 +560,23 @@ export default {
         let error = ref("");
         let modalData = ref("");
         let taskId = ref();
-        let userstatus = ref();
         let options = ref([]);
+        let userOptions = ref([]);
         let showOptions = ref([1, 2, 3, 4, 5, 10, 25, 50, 100]);
         let currentOptions = ref(10);
         let PageRange = ref(5);
         let filteredOptions = ref([]);
         let filteredMobiOptions = ref([]);
-        let userStat = { id: "", status: "" };
+        let assignInit = {
+            task_id: "",
+            remarks: "",
+            user_id: "",
+            email: "",
+            userName: "",
+            due_date: "",
+            start_time: "",
+        };
+        let taskAssign = reactive({ ...assignInit });
         let totalRec = ref(0);
         let totalPages = ref(0);
         let Pages = ref([]);
@@ -552,6 +591,11 @@ export default {
                     if (getRes.value) {
                         options.value = getRes.value;
                         paginateOptions();
+                        getData("/api/getUsers").then(() => {
+                            if (getRes.value) {
+                                userOptions.value = getRes.value;
+                            }
+                        });
                     }
                 })
                 .catch((e) => {
@@ -569,6 +613,8 @@ export default {
         };
         const clearForm = () => {
             Object.assign(form, initialState);
+            taskAssign.remarks = "";
+            taskAssign.user_id = "";
             error.value = null;
         };
         const setHeading = (headSet) => {
@@ -664,10 +710,18 @@ export default {
             getRange(options.value, filteredOptions.value);
             ActivePage.value = page;
         };
-        const setStatus = (d_id, d_status, d_name) => {
-            taskId.value = d_id;
-            userstatus.value = d_status;
-            modalData.value = d_name;
+        const setStatus = (option) => {
+            taskAssign.task_id = option.id;
+            taskAssign.due_date = option.due_date;
+            taskAssign.start_time = option.start_time;
+        };
+        const setUser = () => {
+            let arr = userOptions.value.filter((item) => {
+                if (item.id == taskAssign.user_id) {
+                    taskAssign.userName = item.name;
+                    taskAssign.email = item.email;
+                }
+            });
         };
         const deleteTask = () => {
             postData("/api/deleteTask/" + taskId.value)
@@ -681,27 +735,22 @@ export default {
                     error.value = e;
                 });
         };
-        const statusUsr = () => {
-            if (userstatus.value === 0) {
-                error.value = "You Cannot Change New User Status";
-            } else {
-                if (userstatus.value == 2) {
-                    userStat.status = 1;
-                } else {
-                    userStat.status = 2;
-                }
-                userStat.id = taskId.value;
-                postData("/api/statusUsr", userStat)
-                    .then(() => {
-                        if (resp.value) {
-                            location.reload();
-                            toggleModal();
-                        }
-                    })
-                    .catch((e) => {
-                        error.value = e;
-                    });
-            }
+        const assign = () => {
+            buttonsActive.value = false;
+            postData("/api/assignTask", taskAssign)
+                .then(() => {
+                    if (resp.value) {
+                        location.reload();
+                        toggleModal();
+                    } else {
+                        buttonsActive.value = true;
+                        error.value = msg.value;
+                    }
+                })
+                .catch((e) => {
+                    buttonsActive.value = true;
+                    error.value = e;
+                });
         };
         const addTask = () => {
             buttonsActive.value = false;
@@ -730,13 +779,14 @@ export default {
         return {
             SearchItem,
             options,
+            userOptions,
             showOptions,
             currentOptions,
             filteredOptions,
             filteredMobiOptions,
             error,
             modalData,
-            userstatus,
+            taskAssign,
             modalActive,
             buttonsActive,
             totalRec,
@@ -752,7 +802,6 @@ export default {
             toggleModal,
             setEdit,
             deleteTask,
-            statusUsr,
             setDelete,
             setStatus,
             setHeading,
@@ -760,6 +809,8 @@ export default {
             clearForm,
             heading,
             form,
+            setUser,
+            assign,
         };
     },
 };

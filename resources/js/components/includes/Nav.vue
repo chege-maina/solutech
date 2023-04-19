@@ -19,9 +19,21 @@
             class="md:flex md:items-center md:px-0 px-3 md:pb-0 pb-10 md:static absolute md:w-auto w-full top-14 duration-700 ease-in text-[#310058] bg-gray-50 md:bg-inherit"
             :class="[open ? 'left-0' : 'left-[-100%]']"
         >
+            <li class="md:mx-4 md:my-0 my-6">
+                <div
+                    @click="setMenu('analysis'), closeMenu()"
+                    class="text-xl hover:text-[#510a8b] duration-500 cursor-pointer"
+                >
+                    <router-link
+                        :to="{ name: 'Dashboard' }"
+                        class="text-xl hover:text-[#510a8b] duration-500"
+                        >Analysis</router-link
+                    >
+                </div>
+            </li>
             <li
                 class="md:mx-4 md:my-0 my-6"
-                v-if="$store.getters.user.role != 6"
+                v-if="$store.getters.user.role < 2"
             >
                 <div
                     @click="setMenu('tasks'), closeMenu()"
@@ -34,9 +46,21 @@
                     >
                 </div>
             </li>
+            <li class="md:mx-4 md:my-0 my-6">
+                <div
+                    @click="setMenu('my tasks'), closeMenu()"
+                    class="text-xl hover:text-[#510a8b] duration-500 cursor-pointer"
+                >
+                    <router-link
+                        :to="{ name: 'Dashboard' }"
+                        class="text-xl hover:text-[#510a8b] duration-500"
+                        >My Tasks</router-link
+                    >
+                </div>
+            </li>
             <li
                 class="md:mx-4 md:my-0 my-6"
-                v-if="$store.getters.user.role < 4"
+                v-if="$store.getters.user.role < 2"
             >
                 <div
                     @click="setMenu('users'), closeMenu()"
@@ -46,6 +70,21 @@
                         :to="{ name: 'Dashboard' }"
                         class="text-xl hover:text-[#510a8b] duration-500"
                         >Users</router-link
+                    >
+                </div>
+            </li>
+            <li
+                class="md:mx-4 md:my-0 my-6"
+                v-if="$store.getters.user.role < 2"
+            >
+                <div
+                    @click="setMenu('report'), closeMenu()"
+                    class="text-xl hover:text-[#510a8b] duration-500 cursor-pointer"
+                >
+                    <router-link
+                        :to="{ name: 'Dashboard' }"
+                        class="text-xl hover:text-[#510a8b] duration-500"
+                        >Report</router-link
                     >
                 </div>
             </li>
